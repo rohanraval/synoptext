@@ -20,6 +20,19 @@ var textapi = new AYLIENTextAPI({
     application_key: '2f1cbec3166847a1c0e78dc724b25290'
 });
 
+function removeTimeStamps(text) {
+  lineArray = text.split('\n');
+  newString = '';
+
+  for(var i = 0; i < lineArray.length; i++) {
+      if(!lineArray[i].includes('-->')) {
+          newString = newString.concat(lineArray[i] + '\n');
+      }
+  }
+
+  return newString;
+}
+
 app.get("/", function(req, res) {
     res.send("home");
 });
@@ -51,7 +64,7 @@ app.get('/incoming-sms', (req, res) => {
     for (var i in files) {
       if(path.extname(files[i]) === ".vtt") {
         fs.readFile(files[i], 'utf8', function(err, contents) {
-          captionTrack = contents;
+          captionTrack = removeTimeStamps(contents);
           textapi.summarize({
             title: 'Summary',
             text: captionTrack,
@@ -86,8 +99,6 @@ app.get('/incoming-sms', (req, res) => {
     console.log(captionTrack);
 
     execSync('rm *.vtt');
-
-    /**/
   }, console.log);
 
   res.sendStatus(200);
